@@ -37,10 +37,11 @@ io.on('connection', (socket) => {
   // Once it is recieved it logs it and then transmits it to every user
   // including the sending user.
   // NOTE: io.emit() sends event to EVERY socket (user)
-  socket.on('createMessage', (message) => {
+  socket.on('createMessage', (message, callback) => {
     console.log('createMessage', message);
     // NOTE: io.emit - Emits event to every connection
       io.emit('newMessage', generateMessage(message.from, message.text));
+      callback('This is from the server');
   });
 
     // Code below would transmit message to every user but the sending user's socket
