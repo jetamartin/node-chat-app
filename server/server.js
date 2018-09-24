@@ -47,7 +47,9 @@ io.on('connection', (socket) => {
       // that the client sent to server
       callback();
   });
-
+  
+  // When server receives a createLocationMessage from client containing location info (Lat  Long)
+  // It builds a newLocationMessage containing a link to google map poiting to the location
   socket.on('createLocationMessage', (coords) => {
     io.emit('newLocationMessage', generateLocationMessage('Admin', coords.latitude, coords.longitude));
   })
