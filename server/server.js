@@ -42,7 +42,10 @@ io.on('connection', (socket) => {
     console.log('createMessage', message);
     // NOTE: io.emit - Emits event to every connection
       io.emit('newMessage', generateMessage(message.from, message.text));
-      callback('This is from the server');
+      // Callback is acknowledgement back to client that message was received
+      // it can be used to transmit error information back to client re: createLocationMessage
+      // that the client sent to server
+      callback();
   });
 
   socket.on('createLocationMessage', (coords) => {
