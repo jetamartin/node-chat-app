@@ -1,6 +1,8 @@
 var socket = io();
 
 /*
+  Function Description for: scrollToBottom
+
   If the number of messages is large enough so as to not all be visible on screen
   at the same time we want to auto scroll the user to the bottom of the screen so
   that they can see new incoming messages without having to manually scroll to them.
@@ -61,9 +63,35 @@ function scrollToBottom () {
 
 }
 
+
+// Upon receiving connection from server we need to  get user name and chat room
+// that user entered on 'Join Chatroom page' (index.html page). These params are
+// available to chat.html page via window.location.search as search parameters
+// (name & room) via the url (e.g. http://localhost:3000/chat.html?name=Jet&room=abc).
+// Ultimately we need to extract these parameters and convert them to an object
+// (via deparam method) and emit them to the sever in the 'join' message so that we
+// the server can either add this user to the existing chatroom or create a new
+// chatroom and add the user to it.
+//
+// Note: The user name and chatroom entered on "Join Chatroom page" must be non-blank
+// string values. The server will validate these parameters and if validation fails
+// then the server will call the callback method we provided in socket.emit call with
+// an error. If there was a error then we will redirect the user back
+// to the 'Join Chatroom' page and display the error.
+
 // 'connect' built in event listener for connection
 socket.on('connect', function () {
   console.log('Connected to server');
+  var params = jQuery.deparam(window.location.search);
+  socket.emit('join', params, function(err) {
+    if (err) {
+      alert(err);
+      // if invalid name or chatroom specified redirect user to chat join page
+      window.location.href = '/';
+    } else {
+      console.log('Valid chatroom and name provided')
+    }
+  });
 });
 
 // Display newMesssage sent from Server
@@ -110,6 +138,14 @@ socket.on('disconnect', function ()  {
   console.log('Disconnected from server');
 });
 
+socket.on('updateUserList', function(users) {
+  var ol = jQuery('<ol></ol>');
+
+  users.forEach(function(user) {
+    ol.append(jQuery('<li></li>').text(user));
+  });
+  jQuery('#users').html(ol)
+})
 
 // Create and send clients messagee to server when use clicks "Send" button
 // Also handles clearing the content of messageTextBox after sent
